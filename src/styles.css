@@ -2,3 +2,27 @@
   font-family: sans-serif;
   text-align: center;
 }
+h1 {
+  font-family: "Lato";
+}
+.intro {
+  display: block;
+}
+.header {
+  background-color: #0c2074;
+  color: whitesmoke;
+  border-radius: 10px;
+  font-size: 1.6vmax;
+}
+
+.hero {
+  padding: 20px;
+  /* margin: 40px 0 0 20px; */
+}
+.topBanner {
+  float: right;
+  margin: 33px 10px 0 0 !important;
+  /* display: inline; */
+  margin: auto;
+  padding-left: 20px;
+}

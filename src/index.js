@@ -1,7 +1,12 @@
 import ReactDOM from "react-dom";
-// import modalUs from "./modalUs.csv"
-// import "./styles.css";
+import csv from "/modalUs.csv";
 import React, { PureComponent } from "react";
+import "./styles.css";
+import logo from "./assets/usbank_logo.png";
+
+
+//D3 library adding all the
+import * as d3 from "d3";
 
 import {
   BarChart,
@@ -13,7 +18,7 @@ import {
   Legend
 } from "recharts";
 
-const data = [
+const data1 = [
   {
     name: "Page A",
     uv: 4000,
@@ -58,6 +63,18 @@ const data = [
   }
 ];
 
+let columns = {
+  0: "Inquiry ID",
+  1: "Question",
+  2: "Viewed Response Matches",
+  3: "Unique User ID",
+  4: "First Name",
+  5: "Last Name",
+  6: "Question Source",
+  7: "Date/Time",
+  8: "Rating"
+};
+
 const getIntroOfPage = label => {
   if (label === "Page A") {
     return "Page A is about men's clothing";
@@ -78,14 +95,16 @@ const getIntroOfPage = label => {
     return "Page F is about baby food";
   }
 };
-
 const CustomTooltip = ({ active, payload, label }) => {
   if (active) {
+    console.log(payload)
     return (
       <div className="custom-tooltip">
-        <p className="label">{`${label} : ${payload[0].value}`}</p>
+        <p className="label">{`Q:${label}`}</p>
+        <p className="label">{`A:${payload[0].value}`}</p>
+
         <p className="intro">{getIntroOfPage(label)}</p>
-        <p className="desc">Anything you want can be displayed here.</p>
+        {/* <p className="desc">Anything you want can be displayed here.</p> */}
       </div>
     );
   }
@@ -93,13 +112,51 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-export default class App extends PureComponent {
-  static jsfiddleUrl = "https://jsfiddle.net/alidingling/vxq4ep63/";
+class App extends PureComponent {
+  // static jsfiddleUrl = "https://jsfiddle.net/alidingling/vxq4ep63/";
+  constructor() {
+    super();
+    this.state = {
+      data: []
+    };
+  }
 
+  componentDidMount() {
+    d3.csv(csv, function(d) {
+      return {
+        Question: d["Question"],
+        Response: d["Viewed Response Matches"],
+        Date: d["Date/Time"].split(" "),
+        amount: +d["Viewed Response Matches"]
+      };
+    })
+      .then(function(data) {
+        console.log(data);
+        let json = data;
+        return json;
+      })
+      .then(data => {
+        console.log("data here", data);
+
+        this.setState(
+          {
+            data: data
+          },
+          () => {
+            console.log(this.state.data);
+          }
+        );
+      });
+  }
   render() {
+    const data = this.state.data;
+    console.log(data);
     return (
       <div>
-        <h1 style={{ margin: "40px" }}>UsBank Chat Top Performers</h1>
+        <div className="header">
+        <img className="hero" src={logo} alt="U.S. Bank" itemprop="logo"></img>
+        <h1 className="topBanner">UsBank Chat Top Performers</h1>
+        </div>
         <BarChart
           width={640}
           height={300}
@@ -112,16 +169,37 @@ export default class App extends PureComponent {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="Response" />
+          <YAxis />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend />
+          <Bar dataKey="Question" barSize={5} fill="#8884d8" />
+        </BarChart>
+
+        {/* Test */}
+        <BarChart
+          width={640}
+          height={300}
+          data={data1}
+          margin={{
+            top: 50,
+            right: 30,
+            left: 20,
+            bottom: 5
+          }}
+        >
+          <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
-          <Bar dataKey="pv" barSize={20} fill="#8884d8" />
+          <Bar dataKey="pv" barSize={5} fill="#8884d8" />
         </BarChart>
       </div>
     );
   }
 }
+export default App;
 
 const rootElement = document.getElementById("root");
 ReactDOM.render(<App />, rootElement);
