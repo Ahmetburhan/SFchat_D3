@@ -4,7 +4,6 @@ import React, { PureComponent } from "react";
 import "./styles.css";
 import logo from "./assets/usbank_logo.png";
 
-
 //D3 library adding all the
 import * as d3 from "d3";
 
@@ -97,7 +96,7 @@ const getIntroOfPage = label => {
 };
 const CustomTooltip = ({ active, payload, label }) => {
   if (active) {
-    console.log(payload)
+    console.log(payload);
     return (
       <div className="custom-tooltip">
         <p className="label">{`Q:${label}`}</p>
@@ -122,16 +121,38 @@ class App extends PureComponent {
   }
 
   componentDidMount() {
+    let map = {};
     d3.csv(csv, function(d) {
+      //map olustur
+      console.log("d comes as", d);
+      //       Date/Time: "1/1/2018 0:00"
+      // First Name: ""
+      // Inquiry ID: "518143"
+      // Last Name: ""
+      // Question: "WHAT IS my routing number"
+      // Question Source: "manual entry"
+      // Rating: ""
+      // Unique User ID: "1199355"
+      // Viewed Response Matches: "How do I determine my
+      if (!map[d["Viewed Response Matches"]]) {
+        map[d["Viewed Response Matches"]] = [d["Question"]];
+      } else {
+        map[d["Viewed Response Matches"]] = map[
+          d["Viewed Response Matches"]
+        ].concat(d["Question"]);
+      }
+
+      //
+
       return {
         Question: d["Question"],
-        Response: d["Viewed Response Matches"],
-        Date: d["Date/Time"].split(" "),
-        amount: +d["Viewed Response Matches"]
+        Response: d["Response"] === d["Question"],
+        amount: +d["Question"].length
       };
     })
       .then(function(data) {
-        console.log(data);
+        console.log("type of", typeof data);
+        console.log("map is here", map);
         let json = data;
         return json;
       })
@@ -140,7 +161,7 @@ class App extends PureComponent {
 
         this.setState(
           {
-            data: data
+            data: [].concat(map)
           },
           () => {
             console.log(this.state.data);
@@ -154,11 +175,11 @@ class App extends PureComponent {
     return (
       <div>
         <div className="header">
-        <img className="hero" src={logo} alt="U.S. Bank" itemprop="logo"></img>
-        <h1 className="topBanner">UsBank Chat Top Performers</h1>
+          <img className="hero" src={logo} alt="U.S. Bank" itemprop="logo" />
+          <h1 className="topBanner">UsBank Chat Top Performers</h1>
         </div>
         <BarChart
-          width={640}
+          width={800}
           height={300}
           data={data}
           margin={{
