@@ -9,7 +9,6 @@
     "d3-fetch": "1.1.2",
     "react": "16.8.3",
     "react-dom": "16.8.3",
-    "react-scripts": "2.1.8",
     "recharts": "1.5.0"
   },
   "devDependencies": {

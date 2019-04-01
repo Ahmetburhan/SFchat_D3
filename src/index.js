@@ -111,7 +111,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-class App extends PureComponent {
+class App extends React.Component {
   // static jsfiddleUrl = "https://jsfiddle.net/alidingling/vxq4ep63/";
   constructor() {
     super();
@@ -123,17 +123,6 @@ class App extends PureComponent {
   componentDidMount() {
     let map = {};
     d3.csv(csv, function(d) {
-      //map olustur
-      console.log("d comes as", d);
-      //       Date/Time: "1/1/2018 0:00"
-      // First Name: ""
-      // Inquiry ID: "518143"
-      // Last Name: ""
-      // Question: "WHAT IS my routing number"
-      // Question Source: "manual entry"
-      // Rating: ""
-      // Unique User ID: "1199355"
-      // Viewed Response Matches: "How do I determine my
       if (!map[d["Viewed Response Matches"]]) {
         map[d["Viewed Response Matches"]] = [d["Question"]];
       } else {
@@ -141,19 +130,31 @@ class App extends PureComponent {
           d["Viewed Response Matches"]
         ].concat(d["Question"]);
       }
-
-      //
-
       return {
         Question: d["Question"],
-        Response: d["Response"] === d["Question"],
-        amount: +d["Question"].length
+        Response: d["Question"]
+          ? [].concat(d["Viewed Response Matches"])
+          : d["Viewed Response Matches"],
+        Date: d["Date/Time"].split(" ")[0],
+        amount: +d["Viewed Response Matches"].length
       };
     })
       .then(function(data) {
-        console.log("type of", typeof data);
-        console.log("map is here", map);
-        let json = data;
+        //structured data
+        let vizMap = {};
+        let index = 0;
+        for (let each in map) {
+          vizMap[index] = {
+            Response: each,
+            Questions: map[each]
+          };
+          index++;
+        }
+        console.log("data  here", typeof data);
+        console.log("map  here", map);
+        console.log("vizMap  here", vizMap);
+
+        let json = vizMap;
         return json;
       })
       .then(data => {
@@ -161,7 +162,7 @@ class App extends PureComponent {
 
         this.setState(
           {
-            data: [].concat(map)
+            data: data
           },
           () => {
             console.log(this.state.data);
@@ -171,7 +172,7 @@ class App extends PureComponent {
   }
   render() {
     const data = this.state.data;
-    console.log(data);
+    console.log("Please check this", data);
     return (
       <div>
         <div className="header">
@@ -192,9 +193,9 @@ class App extends PureComponent {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="Response" />
           <YAxis />
-          <Tooltip content={<CustomTooltip />} />
+          {/* <Tooltip content={<CustomTooltip />} /> */}
           <Legend />
-          <Bar dataKey="Question" barSize={5} fill="#8884d8" />
+          <Bar dataKey="Questions" barSize={5} fill="#8884d8" />
         </BarChart>
 
         {/* Test */}
