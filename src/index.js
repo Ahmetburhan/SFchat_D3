@@ -62,6 +62,8 @@ const data1 = [
   }
 ];
 
+console.log("data1 coming as", data1);
+
 let columns = {
   0: "Inquiry ID",
   1: "Question",
